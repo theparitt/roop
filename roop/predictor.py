@@ -1,5 +1,6 @@
 import threading
-import numpy
+import numpy 
+import numpy as np
 import opennsfw2
 from PIL import Image
 from keras import Model
@@ -36,6 +37,13 @@ def predict_frame(target_frame: Frame) -> bool:
 
 def predict_image(target_path: str) -> bool:
     return opennsfw2.predict_image(target_path) > MAX_PROBABILITY
+
+
+# อันนี้ไม่ทำพวก detect ภาพโป๊ 
+def predict_image_array(target_image_array: np.ndarray) -> bool:
+    nsfw_probability = opennsfw2.predict_image_array(target_image_array)
+    return nsfw_probability > MAX_PROBABILITY
+
 
 
 def predict_video(target_path: str) -> bool:

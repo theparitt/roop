@@ -128,14 +128,15 @@ def update_status(message: str, scope: str = 'ROOP.CORE') -> None:
         ui.update_status(message)
 
 
+# ตรงนี้เป็น main หลักเลยของโปรแกรม gui
 def start() -> None:
     for frame_processor in get_frame_processors_modules(roop.globals.frame_processors):
         if not frame_processor.pre_start():
             return
     # process image to image
-    if has_image_extension(roop.globals.target_path):
-        if predict_image(roop.globals.target_path):
-            destroy()
+    if has_image_extension(roop.globals.target_path):        # ถ้าเป็นรูปภาพ 
+        if predict_image(roop.globals.target_path):          #    ตรงนี้มันเป็นตัว check ว่าเป็นภาพโป๊ไหม 
+            destroy()                                        #        ถ้าเป็นภาพโป๊ก็ให้ ทำลายไป
         shutil.copy2(roop.globals.target_path, roop.globals.output_path)
         # process frame
         for frame_processor in get_frame_processors_modules(roop.globals.frame_processors):
@@ -207,7 +208,7 @@ def destroy() -> None:
 
 def run() -> None:
     parse_args()
-    if not pre_check():
+    if not pre_check():            # pre_check ของ core
         return
     for frame_processor in get_frame_processors_modules(roop.globals.frame_processors):
         if not frame_processor.pre_check():

@@ -76,7 +76,7 @@ def enhance_face(target_face: Face, temp_frame: Frame) -> Frame:
         temp_frame[start_y:end_y, start_x:end_x] = temp_face
     return temp_frame
 
-
+#ถ้ามี หลาย Face มันจะทำ enhance face ให้ทุก face
 def process_frame(source_face: Face, reference_face: Face, temp_frame: Frame) -> Frame:
     many_faces = get_many_faces(temp_frame)
     if many_faces:
@@ -93,7 +93,7 @@ def process_frames(source_path: str, temp_frame_paths: List[str], update: Callab
         if update:
             update()
 
-
+# ตรงนี้คือจำทำเฉพาะ tagerget อย่างเดียว 
 def process_image(source_path: str, target_path: str, output_path: str) -> None:
     target_frame = cv2.imread(target_path)
     result = process_frame(None, None, target_frame)

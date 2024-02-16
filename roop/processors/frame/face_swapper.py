@@ -2,6 +2,7 @@ from typing import Any, List, Callable
 import cv2
 import insightface
 import threading
+import numpy as np 
 
 import roop.globals
 import roop.processors.frame.core
@@ -38,6 +39,7 @@ def pre_check() -> bool:
     return True
 
 
+# pre_start
 def pre_start() -> bool:
     if not is_image(roop.globals.source_path):
         update_status('Select an image for source path.', NAME)
@@ -51,6 +53,15 @@ def pre_start() -> bool:
     return True
 
 
+def pre_start_image_array( image_source ) -> bool:
+    if not get_one_face( image_source ):
+        update_status('ไม่เจอหน้าใน image_source ', NAME)
+        return False
+ 
+    return True
+
+
+
 def post_process() -> None:
     clear_face_swapper()
     clear_face_reference()
@@ -60,6 +71,7 @@ def swap_face(source_face: Face, target_face: Face, temp_frame: Frame) -> Frame:
     return get_face_swapper().get(temp_frame, target_face, source_face, paste_back=True)
 
 
+# อันนี้เป็น common ที่แชร์การ process_frame 1 frame หรือ image ( ร่วมระหว่าง  video กับ
 def process_frame(source_face: Face, reference_face: Face, temp_frame: Frame) -> Frame:
     if roop.globals.many_faces:
         many_faces = get_many_faces(temp_frame)
@@ -73,6 +85,7 @@ def process_frame(source_face: Face, reference_face: Face, temp_frame: Frame) ->
     return temp_frame
 
 
+# อันนี้แหละคืออันหลักของโปรแกรมเลย แบบ frame จาก video
 def process_frames(source_path: str, temp_frame_paths: List[str], update: Callable[[], None]) -> None:
     source_face = get_one_face(cv2.imread(source_path))
     reference_face = None if roop.globals.many_faces else get_face_reference()
@@ -84,12 +97,23 @@ def process_frames(source_path: str, temp_frame_paths: List[str], update: Callab
             update()
 
 
+# อันนี้แหละคืออันหลักของโปรแกรมเลย แบบ image
 def process_image(source_path: str, target_path: str, output_path: str) -> None:
     source_face = get_one_face(cv2.imread(source_path))
     target_frame = cv2.imread(target_path)
     reference_face = None if roop.globals.many_faces else get_one_face(target_frame, roop.globals.reference_face_position)
     result = process_frame(source_face, reference_face, target_frame)
     cv2.imwrite(output_path, result)
+
+
+# อันนี้หมูแดงเขียนเองแก้มาจาก process_image
+def process_image_array(source_image: np.ndarray, target_image: np.ndarray) -> np.ndarray:
+    source_face = get_one_face(source_image)                                  #ผลลัพธ์อันนี้ออกมาเป็นแค่ 1 หน้าพอดีเลย Face ไม่ใช้ arrayนะ
+    print( f"[ --------------- อายุของ source_face ] : {source_face.age}" )
+    target_frame = target_image
+    reference_face = None if roop.globals.many_faces else get_one_face(target_frame, roop.globals.reference_face_position)
+    result = process_frame(source_face, reference_face, target_frame)
+    return result
 
 
 def process_video(source_path: str, temp_frame_paths: List[str]) -> None:

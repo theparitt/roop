@@ -10,10 +10,11 @@ from tqdm import tqdm
 
 import roop
 
+# ตรงนี้เป็น function ทั้งหมดที่ใช้ในการ process frame / image
 FRAME_PROCESSORS_MODULES: List[ModuleType] = []
 FRAME_PROCESSORS_INTERFACE = [
-    'pre_check',
-    'pre_start',
+    'pre_check',                    # อันนี้ check พวก onnx ว่า download ไรมาแล้วหรือยัง ถ้า download แล้วก็ทำแค่ครั้งเดียว
+    'pre_start',                    # ตรวจว่าที่ส่งมา เป็น image ไหม เปิดไฟล์ได้เปล่า
     'process_frame',
     'process_frames',
     'process_image',
@@ -22,6 +23,8 @@ FRAME_PROCESSORS_INTERFACE = [
 ]
 
 
+
+# อันนี้เป็น helper เรียกมาจาก get_frame_processors_modules
 def load_frame_processor_module(frame_processor: str) -> Any:
     try:
         frame_processor_module = importlib.import_module(f'roop.processors.frame.{frame_processor}')
@@ -35,6 +38,7 @@ def load_frame_processor_module(frame_processor: str) -> Any:
     return frame_processor_module
 
 
+# ถ้าเราเรียกตรงนี้มันจะคืนค่า module ที่เราต้องการเพิ่ม
 def get_frame_processors_modules(frame_processors: List[str]) -> List[ModuleType]:
     global FRAME_PROCESSORS_MODULES
 
