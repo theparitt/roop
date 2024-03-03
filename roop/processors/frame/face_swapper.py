@@ -63,8 +63,8 @@ def pre_start_image_array( image_source ) -> bool:
 
 
 def post_process() -> None:
-    clear_face_swapper()
-    clear_face_reference()
+    clear_face_swapper()       #ลบ FACE_SWAPPER
+    clear_face_reference()     #ลบ 
 
 
 def swap_face(source_face: Face, target_face: Face, temp_frame: Frame) -> Frame:
@@ -113,6 +113,7 @@ def process_image_array(source_image: np.ndarray, target_image: np.ndarray) -> n
     target_frame = target_image
     reference_face = None if roop.globals.many_faces else get_one_face(target_frame, roop.globals.reference_face_position)
     result = process_frame(source_face, reference_face, target_frame)
+    post_process()         #หมูแดงเพิ่มมาเอง เอาไว้ลบ insightface 
     return result
 
 
